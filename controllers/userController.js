@@ -5,7 +5,7 @@ const passport = require("passport")
 var mongodb = require('mongodb');
 require("../authentication/passport/local");
 
-
+//admin kitap ekleme
 module.exports.postAdminAddBook = (req,res,next) =>{
      const bookName = req.body.bookName;
      const isbnNumber = req.body.isbnNumber;
