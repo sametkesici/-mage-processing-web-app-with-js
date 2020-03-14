@@ -20,8 +20,27 @@ const UserSchema = new Schema({
         default : false
     }
 
+    
 })
 
+const BookSchema = new Schema ({
+
+    bookName : {
+        type : String,
+        required : true
+    },
+    
+    isbnNumber : {
+        type : String,
+        required : true
+        
+
+
+    }
+
+})
+
+ 
 
 const User = mongoose.model("User",UserSchema);
 

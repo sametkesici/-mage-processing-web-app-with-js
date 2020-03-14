@@ -10,6 +10,8 @@ router.get("/logout",userController.getUserLogout)
 router.get("/register", userController.getUserRegister)
 router.post("/login",userController.postUserLogin)
 router.post("/register",userController.postUserRegister)
+router.get("/admin",userController.getUserLoginAdmin)
+router.post("/admin",userController.postAdminAddBook)
 
 
 

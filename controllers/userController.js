@@ -2,9 +2,42 @@ const formValidation = require("../validation/formValidation")
 const bcrypt = require('bcrypt');
 const User = require("../models/User")
 const passport = require("passport")
+var mongodb = require('mongodb');
 require("../authentication/passport/local");
 
 
+module.exports.postAdminAddBook = (req,res,next) =>{
+     const bookName = req.body.bookName;
+     const isbnNumber = req.body.isbnNumber;
+
+
+     var data1={
+        bookName,
+        isbnNumber
+    };
+    
+  mongodb.MongoClient.connect('mongodb://localhost', function (err, client) {
+  if (err) throw err;
+
+  const db = client.db('yazlabdb');
+  var Data=[data1];
+
+    db.collection("books").insertMany(Data,forceServerObjectId=true,function (err,data) {
+        if(err!=null){
+            return console.log(err);
+        }
+        console.log(data.ops);
+
+    });
+    
+    res.render("pages/admin")
+
+}); 
+}
+
+module.exports.getUserLoginAdmin = (req,res,next) =>{
+    res.render("pages/admin")
+}
 
 module.exports.getUserLogin = (req, res, next) => {
     res.render("pages/login")
