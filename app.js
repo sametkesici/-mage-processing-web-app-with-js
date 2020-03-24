@@ -12,7 +12,7 @@ const cookiePartser = require("cookie-parser");
 
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
 app.use(cookiePartser("yazlab"));
 app.use(session({cookie : {maxAge : 60000 }, 
