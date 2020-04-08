@@ -21,7 +21,8 @@
     "mongoose": "^5.9.4",
     "nodemon": "^2.0.2",
     "passport": "^0.4.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "tesseract.js": "^2.1.1"
   },
   "devDependencies": {
     "handlebars": "^4.5.0"
