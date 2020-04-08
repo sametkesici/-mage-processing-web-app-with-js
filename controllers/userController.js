@@ -11,25 +11,25 @@ require("../authentication/passport/local");
 //admin kitap ekleme
 
 module.exports.postAdminAddBook = (req, res, next) => {
-  const bookName = req.body.bookName;
+  var bookName = req.body.bookName;
+  
   const isbnNumber = req.body.isbnNumber;
-
+  console.log(req.files.imageFile);
   //Book name is stored in the bookname variable. Book's ISBN image is stored in imageFile object.
-  console.log(req.files.imageFile + "---- ");
   if (!(req.files && req.files.imageFile)) {
     let imageFile = req.files.imageFile;
     console.log("Name of the image file: " + imageFile);
   }
-  let imageAddress = "./isbnPictures/" + bookName + ".jpeg";
+  let imageAddress = "../isbnPictures/" + bookName.trim() + ".jpeg";
 
   //consola yazdır
-  console.log("Name of the image file: " + imageFile);
-  console.log("Image object: " + imageAddress);
-  console.log("Name of the book: " + bookName);
+  //console.log("Name of the image file: " + imageFile.bookName);
+  //console.log("Image object: " + imageFile);
+  console.log("Name of the book: " + bookName.trim());
 
 
   //dosyayı taşı
-  imageFile.mv(imageAddress, function (error) {
+  req.files.imageFile.mv("./gorsel/" + bookName + ".jpeg", function (error) {
     if (error) {
       console.log("Couldn't upload the isbn image file.");
       console.log(error);
