@@ -5,15 +5,13 @@ const passport = require("passport");
 var mongodb = require("mongodb");
 const { createWorker } = require("tesseract.js");
 
-
-
 require("../authentication/passport/local");
 
 //admin kitap ekleme
 
 module.exports.postAdminAddBook = (req, res, next) => {
   var bookName = req.body.bookName;
-  
+
   console.log(req.files.imageFile);
   //Book name is stored in the bookname variable. Book's ISBN image is stored in imageFile object.
   if (!(req.files && req.files.imageFile)) {
@@ -24,82 +22,88 @@ module.exports.postAdminAddBook = (req, res, next) => {
   let imageAddress = "./gorsel/" + bookName + ".jpeg";
 
   //consola yazdır
-  //console.log("Name of the image file: " + imageFile.bookName);
-  //console.log("Image object: " + imageFile);
   console.log("Name of the book: " + bookName);
 
   let isbn = "";
-  //dosyayı taşı
-  req.files.imageFile.mv(imageAddress, function (error) {
-    if (error) {
-      console.log("Couldn't upload the isbn image file.");
-      console.log(error);
-    } else {
-      console.log("Image file successfully uploaded!");
-      readText(imageAddress);
-    }
-  });
-
-  const worker = createWorker();
-
-  
-  async function readText ( imageAddress ) {
-      await worker.load();
-      await worker.loadLanguage("eng");
-      await worker.initialize("eng");
-      const {
-        data: { text },
-      } = await worker.recognize( imageAddress );
-      console.log(text);
-      await worker.terminate();
-      //get the isbn number from readed text
-      let textArr = text.split("\n");
-      var isbnText = "";
-      var i;
-
-      for(i= 0; i < textArr.length; i++){
-        var str = textArr[i];
-        if (str.includes("ISBN")){
-          isbnText = textArr[i];
-        }
-      }
-      isbnText = isbnText.replace("ISBN", "");
-      let isbnNumber = isbnText.replace(/-/g, "");
-      isbnNumber = isbnNumber.replace(/\D/g, '')
-      console.log(isbnNumber);
-      return isbnNumber;
-      
-    }
-
-    console.log(isbn +"outside func");
-  
 
   var data1 = {
     bookName,
     isbn,
   };
 
-  // pushlamak için yorum satırı
-  mongodb.MongoClient.connect("mongodb://localhost", function (err, client) {
-    if (err) throw err;
 
-    const db = client.db("yazlabdb");
-    var Data = [data1];
-
-    db.collection("books").insertMany(
-      Data,
-      (forceServerObjectId = true),
-      function (err, data) {
-        if (err != null) {
-          return console.log(err);
-        }
-        console.log(data.ops);
-      }
-    );
-
-    res.render("pages/admin");
+  //dosyayı taşı
+  req.files.imageFile.mv(imageAddress, async function (error) {
+    if (error) {
+      console.log("Couldn't upload the isbn image file.");
+      console.log(error);
+    } else {
+      console.log("Image file successfully uploaded!");
+      /*readText(imageAddress)
+        .then((isbnNumber) => {
+          data1.isbn = isbnNumber;
+          console.log("mahmuuut"+ data1.isbn)
+        })
+        .catch();*/
+      data1.isbn = await readText(imageAddress);
+      await saveToDatabase(data1)
+    }
   });
+
+
+  const worker = createWorker();
+
+  async function readText(imageAddress, book) {
+    await worker.load();
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+    const {
+      data: { text },
+    } = await worker.recognize(imageAddress);
+    console.log(text);
+    await worker.terminate();
+    //get the isbn number from readed text
+    let textArr = text.split("\n");
+    var isbnText = "";
+    var i;
+
+    for (i = 0; i < textArr.length; i++) {
+      var str = textArr[i];
+      if (str.includes("ISBN")) {
+        isbnText = textArr[i];
+      }
+    }
+    isbnText = isbnText.replace("ISBN", "");
+    let isbnNumber = isbnText.replace(/-/g, "");
+    isbnNumber = isbnNumber.replace(/\D/g, "");
+    console.log(isbnNumber);
+    return isbnNumber;
+  }
+
+  // pushlamak için yorum satırı
+  async function saveToDatabase(data1){
+    mongodb.MongoClient.connect("mongodb://localhost", function (err, client) {
+      if (err) throw err;
+      
+      const db = client.db("yazlabdb");
+      var Data = [data1];
+      
+      db.collection("books").insertMany(
+        Data,
+        (forceServerObjectId = true),
+        function (err, data) {
+          if (err != null) {
+            return console.log(err);
+          }
+          console.log(data.ops);
+        }
+        );
+        
+        res.render("pages/admin");
+      });
+    }
 };
+
 
 module.exports.getUserLoginAdmin = (req, res, next) => {
   res.render("pages/admin");
@@ -136,7 +140,6 @@ module.exports.postUserRegister = (req, res, next) => {
     username,
     password
   );
-
   //ServerSide Validation
   if (validationErrors.length > 0) {
     return res.render("pages/register", {
