@@ -9,6 +9,7 @@ const passport = require('passport')
 const flash = require("connect-flash");
 const session = require("express-session");
 const cookiePartser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 
 
 const app = express();
@@ -62,6 +63,7 @@ db.once("open",() =>{
 });
 
 //handlebars
+app.use(fileUpload());
 
 app.engine('handlebars', exphbs({defaultLayout:'mainLayout'}));
 app.set('view engine', 'handlebars');

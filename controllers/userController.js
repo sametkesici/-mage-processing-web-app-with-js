@@ -5,6 +5,8 @@ const Book = require("../models/Book");
 const BooksAndUsers = require("../models/BooksAndUsers");
 const passport = require("passport");
 var mongodb = require("mongodb");
+const { createWorker } = require("tesseract.js");
+
 require("../authentication/passport/local");
 
 module.exports.postKitapAra = (req, res, next) => {
@@ -60,15 +62,76 @@ module.exports.getKitapAra = (req, res, next) => {
 
 //admin kitap ekleme
 module.exports.postAdminAddBook = (req, res, next) => {
-  const bookName = req.body.bookName;
-  const isbnNumber = req.body.isbnNumber;
+  var bookName = req.body.bookName;
+
+  console.log(req.files.imageFile);
+  //Book name is stored in the bookname variable. Book's ISBN image is stored in imageFile object.
+  if (!(req.files && req.files.imageFile)) {
+    let imageFile = req.files.imageFile;
+    console.log("Name of the image file: " + imageFile);
+  }
+  bookName = bookName.split(" ").join("");
+  let imageAddress = "./gorsel/" + bookName + ".jpeg";
+
+  //consola yazdır
+  console.log("Name of the book: " + bookName);
+
+  let isbn = "";
 
   var data1 = {
     bookName,
-    isbnNumber,
+    isbn,
   };
 
-  if (bookName != "" || isbnNumber != "") {
+  //dosyayı taşı
+  req.files.imageFile.mv(imageAddress, async function (error) {
+    if (error) {
+      console.log("Couldn't upload the isbn image file.");
+      console.log(error);
+    } else {
+      console.log("Image file successfully uploaded!");
+      /*readText(imageAddress)
+        .then((isbnNumber) => {
+          data1.isbn = isbnNumber;
+          console.log("mahmuuut"+ data1.isbn)
+        })
+        .catch();*/
+      data1.isbn = await readText(imageAddress);
+      await saveToDatabase(data1);
+    }
+  });
+
+  const worker = createWorker();
+
+  async function readText(imageAddress, book) {
+    await worker.load();
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+    const {
+      data: { text },
+    } = await worker.recognize(imageAddress);
+    console.log(text);
+    await worker.terminate();
+    //get the isbn number from readed text
+    let textArr = text.split("\n");
+    var isbnText = "";
+    var i;
+
+    for (i = 0; i < textArr.length; i++) {
+      var str = textArr[i];
+      if (str.includes("ISBN")) {
+        isbnText = textArr[i];
+      }
+    }
+    isbnText = isbnText.replace("ISBN", "");
+    let isbnNumber = isbnText.replace(/-/g, "");
+    isbnNumber = isbnNumber.replace(/\D/g, "");
+    console.log(isbnNumber);
+    return isbnNumber;
+  }
+
+  // pushlamak için yorum satırı
+  async function saveToDatabase(data1) {
     mongodb.MongoClient.connect("mongodb://localhost", function (err, client) {
       if (err) throw err;
 
@@ -85,9 +148,9 @@ module.exports.postAdminAddBook = (req, res, next) => {
           console.log(data.ops);
         }
       );
+
+      res.render("pages/admin");
     });
-  } else {
-    res.render("pages/admin");
   }
 };
 

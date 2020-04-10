@@ -1,10 +1,15 @@
-<form action="/admin" method="POST">
+<form action="/admin" method="POST" enctype="multipart/form-data">
   <div class="m-2">
     <label for="bookName">KİTAP ADI:</label>
-    <input type="text"  name="bookName"><br><br>
-    <label for="isbnNumber">ISBN NUMBER:</label>
-    <input type="text"  name="isbnNumber"><br><br>
+    <input type="text" name="bookName"><br><br>
+
+    <input type="file" id="imageFile" accept="image/*" name="imageFile" onchange="readURL(this);">
+    <img id="blah" src="#" alt="your image" />
+    <br><br>
+    <label for="isbnNumber">ISBN NUMARASI:</label>
+    <input type="text" name="isbnNumber"><br><br>
     <button type="submit" onclick="myFunction()" class="btn btn-danger">kaydet</button>
+
   </div>
 
   <div class="m-2">
@@ -20,6 +25,18 @@ function myFunction() {
   alert("Veritabanına Kaydedildi");
 
 }
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#blah')
+          .attr('src', e.target.result)
+          .width(150)
+          .height(200);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
 function addDays(dateObj, numDays) {
    dateObj.setDate(dateObj.getDate() + numDays);
    return dateObj;
