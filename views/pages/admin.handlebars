@@ -6,14 +6,35 @@
     <input type="text"  name="isbnNumber"><br><br>
     <button type="submit" onclick="myFunction()" class="btn btn-danger">kaydet</button>
   </div>
-  
-  
+
+  <div class="m-2">
+    <label for="zamanAtlama">Zamanı İleri Sar : </label>
+    <input id="myInput" type="text" name="zamanAtlama"><br><br>
+    <button type="submit" onclick="gosterZamanı()" class="btn btn-danger">Zamanı Sar</button>
+ </div>
 
 
- <script>
+<script>
+
 function myFunction() {
   alert("Veritabanına Kaydedildi");
+
 }
+function addDays(dateObj, numDays) {
+   dateObj.setDate(dateObj.getDate() + numDays);
+   return dateObj;
+}
+
+function gosterZamanı()
+{
+  var inputVal = document.getElementById("myInput").value;
+  var now = new Date(); //Current date
+  var nextWeek = addDays(now , Number(inputVal));
+  alert(nextWeek);
+  
+}
+
+
 </script>
  
   

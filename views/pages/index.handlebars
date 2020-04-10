@@ -1,20 +1,20 @@
 <div class="card">
     <h5 class="card-header">Registered Users</h5>
-        <div class="card-body">
-            <ul class="list-group">
+    <div class="card-body">
+        <ul class="list-group">
 
-                {{#each users}}
-                    <li class = "list-group-item">{{username}}</li>
-                    {{else}}
-                    <div class="alert alert-info">
-                        There is No Registered Users!
-                    </div>
-                {{/each}}
-            </ul>
-        </div>
+            {{#each users}}
+            <li class="list-group-item">{{username}}</li>
+            {{else}}
+            <div class="alert alert-info">
+                There is No Registered Users!
+            </div>
+            {{/each}}
+        </ul>
+    </div>
 
-        {{#if user}}
-        <h4 class="m-2">Aktif Kullanıcı : {{user.username}}</h4>
-        {{/if}}
+    {{#if user}}
+    <h4 class="m-2">Aktif Kullanıcı : {{user.username}}</h4>
+    {{/if}}
 
 </div>

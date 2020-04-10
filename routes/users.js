@@ -12,6 +12,8 @@ router.post("/login",userController.postUserLogin)
 router.post("/register",userController.postUserRegister)
 router.get("/admin",userController.getUserLoginAdmin)
 router.post("/admin",userController.postAdminAddBook)
+router.get("/kitapara",userController.getKitapAra)
+router.post("/kitapara",userController.postKitapAra)
 
 
 

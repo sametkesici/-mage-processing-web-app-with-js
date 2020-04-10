@@ -23,22 +23,6 @@ const UserSchema = new Schema({
     
 })
 
-const BookSchema = new Schema ({
-
-    bookName : {
-        type : String,
-        required : true
-    },
-    
-    isbnNumber : {
-        type : String,
-        required : true
-        
-
-
-    }
-
-})
 
  
 

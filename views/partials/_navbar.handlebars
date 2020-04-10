@@ -7,6 +7,10 @@
     <ul class="navbar-nav">
 
       {{#if user}}
+        <li class="nav-item active">
+        <a class="nav-link" href="/kitapara">Kitap Ara</a>
+        </li>
+
          <li class="nav-item active">
         <a class="nav-link" href="/logout">Log out</a>
         </li>
@@ -20,6 +24,7 @@
         <li class="nav-item active">
         <a class="nav-link" href="/register">Register</a>
         </li>
+        
 
       {{#if user.isAdmin}}
         <li class="nav-item active">
