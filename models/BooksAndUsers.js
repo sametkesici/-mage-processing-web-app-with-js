@@ -7,12 +7,14 @@ const BooksandUsersSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "users",
   },
-
   books: [
     {
       bookIsbn: { type: String, default: 0 },
       bookDate: { type: Date, default: Date.now },
-      returnDate: { type: Date, default: Date.now },
+      returnDate: {
+        type: Date,
+        default: Date.now,
+      },
     },
   ],
 });
