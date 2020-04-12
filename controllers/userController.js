@@ -12,6 +12,16 @@ const { createWorker } = require("tesseract.js");
 //var nWorkers = 4;
 require("../authentication/passport/local");
 
+module.exports.postKitapVer = (req, res, next) => {
+  console.log(req.body);
+  for (var key in req.body) {
+    if (req.body.hasOwnProperty(key)) {
+      console.log(req.body[key].bookName);
+    }
+  }
+  console.log(req.user);
+};
+
 module.exports.postKitapAra = (req, res, next) => {
   console.log(req.body);
   for (var key in req.body) {
