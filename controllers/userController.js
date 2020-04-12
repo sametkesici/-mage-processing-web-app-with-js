@@ -6,12 +6,17 @@ const BooksAndUsers = require("../models/BooksAndUsers");
 const passport = require("passport");
 var mongodb = require("mongodb");
 const { createWorker } = require("tesseract.js");
+<<<<<<< HEAD
 //var imageThreshold = require("image-filter-threshold");
+=======
+const mongoose = require("mongoose");
+>>>>>>> b44337d2e73fc0131e773906a2901323eedbf21a
 
 
 //var nWorkers = 4;
 require("../authentication/passport/local");
 
+<<<<<<< HEAD
 module.exports.postKitapVer = (req, res, next) => {
   console.log(req.body);
   for (var key in req.body) {
@@ -20,16 +25,103 @@ module.exports.postKitapVer = (req, res, next) => {
     }
   }
   console.log(req.user);
+=======
+module.exports.postKitapVarmi = (req, res, next) => {
+  var MongoClient = require("mongodb").MongoClient;
+  var url = "mongodb://localhost:27017/";
+  const query = { books: [{ bookIsbn: req.body.id }] };
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    var dbo = db.db("yazlabdb");
+    dbo
+      .collection("BooksAndUsers")
+      .find({})
+      .toArray(function (err, result) {
+        if (err) throw err;
+
+        let sendBool = false;
+        result.forEach((book) => {
+          book.books.forEach((item) => {
+            if (item.bookIsbn == req.body.id) {
+              sendBool = true;
+            }
+          });
+        });
+        res.send(sendBool);
+        db.close();
+      });
+  });
+>>>>>>> b44337d2e73fc0131e773906a2901323eedbf21a
 };
 
 module.exports.postKitapAra = (req, res, next) => {
-  console.log(req.body);
+  //console.log({ Alo: req.user });
+  let bookItem = [];
+
+  function addDays(dateObj, numDays) {
+    dateObj.setDate(dateObj.getDate() + numDays);
+    return dateObj;
+  }
+  var now = new Date();
+  var nextWeek = addDays(now, Number(7));
+
   for (var key in req.body) {
     if (req.body.hasOwnProperty(key)) {
-      console.log(req.body[key].bookName);
+      bookItem.push({
+        bookIsbn: req.body[key].isbnNumber,
+        bookDate: new Date(),
+        returnDate: nextWeek,
+      });
     }
   }
-  console.log(req.user);
+
+  let jsonDataForSend = {
+    userId: req.user._id,
+    books: bookItem,
+  };
+
+  let jsonDataForUpdate = {
+    $set: {
+      userId: req.user._id,
+      books: bookItem,
+    },
+  };
+
+  const query = { userId: req.user._id };
+
+  var MongoClient = require("mongodb").MongoClient;
+  var url = "mongodb://localhost:27017/";
+
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    var dbo = db.db("yazlabdb");
+    dbo
+      .collection("BooksAndUsers")
+      .find(query)
+      .toArray(function (err, result) {
+        if (err) throw err;
+        if (result.length !== 0) {
+          dbo
+            .collection("BooksAndUsers")
+            .updateOne(query, jsonDataForUpdate, function (err, res) {
+              if (err) throw err;
+              console.log("1 document updated");
+              db.close();
+            });
+        } else {
+          dbo
+            .collection("BooksAndUsers")
+            .insertOne(jsonDataForSend, function (err, res) {
+              if (err) throw err;
+              console.log({ ALO: JSON.stringify(res) });
+              console.log("1 document inserted");
+              db.close();
+            });
+        }
+        console.log(result);
+        db.close();
+      });
+  });
 };
 
 module.exports.getKitapAra = (req, res, next) => {

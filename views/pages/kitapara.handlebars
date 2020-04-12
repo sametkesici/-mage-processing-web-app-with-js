@@ -15,7 +15,7 @@
             <h3>Kitaplar</h3>
             <div class="list-group">
                 {{#each books}}
-                <a class="list-group-item clearfix" id="{{_id}}" onclick="saveBook(this)">
+                <a class="list-group-item clearfix" id="{{isbnNumber}}" onclick="saveBook(this)">
                     {{bookName}}
                     <span class="pull-right">
                         <span class="btn btn-xs btn-default" onclick="">
@@ -29,11 +29,16 @@
                 </div>
                 {{/each}}
             </div>
-            <form action="/kitapara" method="POST">
-                <div class="m-2">
-                    <button type="submit" onclick="submitBooks()" class="btn btn-danger">kaydet</button>
-                </div>
-            </form>
+
+            <div class="m-2">
+                <button type="submit" onclick="submitBooks()" class="btn btn-danger">kaydet</button>
+            </div>
+            <span></span>
+            <div>
+            </div>
+            <div id="chosenBooks">
+                Seçtiğin Kitaplar:
+            </div>
         </div>
 
     </div>
@@ -44,17 +49,33 @@
 <script>
 
 
-
-
     let bookList = [];
-
+    let concList = '';
     saveBook = (e) => {
-        if (bookList.length < 3) {
-            bookList = [...bookList, { bookName: e.innerText, id: e.id }]
-        } else {
-            alert("3 ten fazla kitap secemezsiniz")
-        }
-        console.log(bookList)
+        var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+        xmlhttp.open("POST", "/kitapvarmi");
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.responseText == "false") {
+                    if (bookList.length < 3) {
+                        concList = '';
+                        bookList = [...bookList, { bookName: e.innerText, isbnNumber: e.id }]
+                        bookList.forEach(book => {
+                            concList += `${book.bookName} `
+                        })
+                        document.querySelector("#chosenBooks").innerHTML = `Seçtiğin Kitaplar: ${concList}`
+                    } else {
+                        alert("3 ten fazla kitap secemezsiniz")
+                    }
+                    console.log(bookList)
+                } else {
+                    alert("KITAP BASKASINDA EKLI");
+                }
+            }
+        };
+        xmlhttp.send(JSON.stringify({ id: e.id }));
+
     }
 
     submitBooks = (e) => {
