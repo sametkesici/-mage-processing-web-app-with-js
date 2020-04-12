@@ -22,7 +22,7 @@ module.exports.postKitapVarmi = (req, res, next) => {
       .find({})
       .toArray(function (err, result) {
         if (err) throw err;
-
+        
         let sendBool = false;
         result.forEach((book) => {
           book.books.forEach((item) => {
