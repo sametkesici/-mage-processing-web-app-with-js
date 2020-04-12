@@ -6,7 +6,10 @@ const BooksAndUsers = require("../models/BooksAndUsers");
 const passport = require("passport");
 var mongodb = require("mongodb");
 const { createWorker } = require("tesseract.js");
+//var imageThreshold = require("image-filter-threshold");
 
+
+//var nWorkers = 4;
 require("../authentication/passport/local");
 
 module.exports.postKitapAra = (req, res, next) => {
@@ -82,6 +85,8 @@ module.exports.postAdminAddBook = (req, res, next) => {
     bookName,
     isbn,
   };
+
+  //let image = imageThreshold(req.files.imageFile, { imageThreshold: 30 }, nWorkers);
 
   //dosyayı taşı
   req.files.imageFile.mv(imageAddress, async function (error) {
