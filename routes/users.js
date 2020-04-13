@@ -12,5 +12,6 @@ router.post("/admin", userController.postAdminAddBook);
 router.get("/kitapara", userController.getKitapAra);
 router.post("/kitapara", userController.postKitapAra);
 router.post("/kitapvarmi", userController.postKitapVarmi);
-
+router.get("/kitapver", userController.getKitapVer);
+router.post("/kitapver", userController.postKitapVer);
 module.exports = router;
