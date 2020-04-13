@@ -6,26 +6,110 @@ const BooksAndUsers = require("../models/BooksAndUsers");
 const passport = require("passport");
 var mongodb = require("mongodb");
 const { createWorker } = require("tesseract.js");
-<<<<<<< HEAD
 //var imageThreshold = require("image-filter-threshold");
-=======
 const mongoose = require("mongoose");
->>>>>>> b44337d2e73fc0131e773906a2901323eedbf21a
-
 
 //var nWorkers = 4;
 require("../authentication/passport/local");
 
-<<<<<<< HEAD
-module.exports.postKitapVer = (req, res, next) => {
-  console.log(req.body);
-  for (var key in req.body) {
-    if (req.body.hasOwnProperty(key)) {
-      console.log(req.body[key].bookName);
-    }
+async function removeBookFromUser(isbn, userIds) {
+  console.log("\n\nKİTAP SİLİNME BAŞLADI");
+  console.log("ŞUANKİ KULLANICI", userIds);
+  console.log("SİLİNECEK ISBN:", isbn);
+
+  var MongoClient = require("mongodb").MongoClient;
+  MongoClient.connect("mongodb://localhost:27017/", function (err, db) {
+    if (err) throw err;
+    var dbo = db.db("yazlabdb");
+    let jsonDataForUpdate = {
+      $pull: {
+        books: {
+          bookIsbn: isbn,
+        },
+      },
+    };
+    let query = { userId: userIds };
+    dbo
+      .collection("BooksAndUsers")
+      .updateOne(query, jsonDataForUpdate, function (err, res) {
+        if (err) throw err;
+        console.log("1 document updated");
+        db.close();
+        return true;
+      });
+  });
+}
+
+module.exports.postKitapVer = async (req, res, next) => {
+  console.log("seçilen dosyanın adı : " + req.files.imageFile.name);
+  //Book name is stored in the bookname variable. Book's ISBN image is stored in imageFile object.
+  if (!(req.files && req.files.imageFile)) {
+    let imageFile = req.files.imageFile.name;
+    console.log("Name of the image file: " + imageFile);
   }
-  console.log(req.user);
-=======
+  let tempAdress = "./gorsel/temp.jpg";
+  //dosyayı taşı
+  req.files.imageFile.mv(tempAdress, async function (error) {
+    if (error) {
+      console.log("Couldn't upload the isbn image file.");
+      console.log(error);
+    } else {
+      console.log("Image file successfully uploaded!");
+      let isbn = await readText(tempAdress);
+      console.log("isbn : " + isbn);
+      let responseFromRemove;
+      if (req.user._id) {
+        responseFromRemove = await removeBookFromUser(isbn, req.user._id);
+
+        if (responseFromRemove) {
+          console.log("BAŞARIYLA GERÇEKTEN SİLİNDİ", data);
+          res.render("pages/kitapver");
+        } else {
+          console.log(
+            responseFromRemove + "\nBAŞARIYLA HATA GELDİ ABİ BUNEDİR"
+          );
+          res.render("pages/kitapver");
+        }
+      } else {
+        console.log("KULLANICI GİRİŞ YAPILMADI");
+        res.render("pages/kitapver");
+      }
+    }
+  });
+
+  //read isbn number from given image folder
+  const worker = createWorker();
+  async function readText(imageAddress, book) {
+    await worker.load();
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+    const {
+      data: { text },
+    } = await worker.recognize(imageAddress);
+    console.log(text);
+    await worker.terminate();
+    //get the isbn number from readed text
+    let textArr = text.split("\n");
+    var isbnText = "";
+    var i;
+
+    for (i = 0; i < textArr.length; i++) {
+      var str = textArr[i];
+      if (str.includes("ISBN")) {
+        isbnText = textArr[i];
+      }
+    }
+    isbnText = isbnText.replace("ISBN", "");
+    let isbnNumber = isbnText.replace(/-/g, "");
+    isbnNumber = isbnNumber.replace(/\D/g, "");
+    console.log("RESİMDEN OKUNDU ISBN::::", isbnNumber);
+    return isbnNumber;
+  }
+};
+
+module.exports.getKitapVer = (req, res, next) => {
+  res.render("pages/kitapver");
+};
 module.exports.postKitapVarmi = (req, res, next) => {
   var MongoClient = require("mongodb").MongoClient;
   var url = "mongodb://localhost:27017/";
@@ -51,7 +135,6 @@ module.exports.postKitapVarmi = (req, res, next) => {
         db.close();
       });
   });
->>>>>>> b44337d2e73fc0131e773906a2901323eedbf21a
 };
 
 module.exports.postKitapAra = (req, res, next) => {
@@ -67,6 +150,7 @@ module.exports.postKitapAra = (req, res, next) => {
 
   for (var key in req.body) {
     if (req.body.hasOwnProperty(key)) {
+      console.log("kitaplarin isbnsi :::: "+ req.body[0].isbnNumber);
       bookItem.push({
         bookIsbn: req.body[key].isbnNumber,
         bookDate: new Date(),
