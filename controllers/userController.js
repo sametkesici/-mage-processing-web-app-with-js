@@ -9,6 +9,8 @@ const { createWorker } = require("tesseract.js");
 //var imageThreshold = require("image-filter-threshold");
 const mongoose = require("mongoose");
 
+var now = new Date();
+
 //var nWorkers = 4;
 require("../authentication/passport/local");
 
@@ -145,12 +147,11 @@ module.exports.postKitapAra = (req, res, next) => {
     dateObj.setDate(dateObj.getDate() + numDays);
     return dateObj;
   }
-  var now = new Date();
   var nextWeek = addDays(now, Number(7));
 
   for (var key in req.body) {
     if (req.body.hasOwnProperty(key)) {
-      console.log("kitaplarin isbnsi :::: "+ req.body[0].isbnNumber);
+      console.log("kitaplarin isbnsi :::: " + req.body[0].isbnNumber);
       bookItem.push({
         bookIsbn: req.body[key].isbnNumber,
         bookDate: new Date(),
@@ -265,11 +266,11 @@ module.exports.postAdminAddBook = (req, res, next) => {
   //consola yazdır
   console.log("Name of the book: " + bookName);
 
-  let isbn = "";
+  let isbnNumber = "";
 
   var data1 = {
     bookName,
-    isbn,
+    isbnNumber,
   };
 
   //let image = imageThreshold(req.files.imageFile, { imageThreshold: 30 }, nWorkers);
@@ -287,7 +288,7 @@ module.exports.postAdminAddBook = (req, res, next) => {
           console.log("mahmuuut"+ data1.isbn)
         })
         .catch();*/
-      data1.isbn = await readText(imageAddress);
+      data1.isbnNumber = await readText(imageAddress);
       await saveToDatabase(data1);
     }
   });
