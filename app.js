@@ -12,6 +12,14 @@ const cookiePartser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 
 
+mongoose.connect("mongodb://localhost:27017/yazlabdb",{
+    useCreateIndex: true,   
+  useNewUrlParser: true
+}).then(data=>{
+    console.log("CONNECTED DATABASE FROM APP.JS")
+})
+mongoose.Promise = global.Promise;
+
 const app = express();
 const PORT = 5000;
 
