@@ -8,13 +8,13 @@
     <br><br><br>
     <button type="submit" onclick="myFunction()" class="btn btn-danger">kaydet</button>
 
-</div>
+  </div>
 </form>
 <form action="/admin2" method="POST">
   <div class="m-2">
     <label for="zamanAtlama">Zamanı İleri Sar : </label>
     <input id="myInput" type="text" name="zamanAtlama"><br><br>
-    <button type="submit" onclick="gosterZamanı()" class="btn btn-danger">Zamanı Sar</button>
+    <button type="submit" class="btn btn-danger">Zamanı Sar</button>
 </div>
 
 </form>
@@ -34,7 +34,7 @@
         };
         reader.readAsDataURL(input.files[0]);
       }
-    }
+    }/*
     function addDays(dateObj, numDays) {
       dateObj.setDate(dateObj.getDate() + numDays);
       return dateObj;
@@ -46,7 +46,7 @@
       var nextWeek = addDays(now, Number(inputVal));
       alert(nextWeek);
 
-    }
+    }*/
 
 
   </script>

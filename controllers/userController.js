@@ -15,7 +15,7 @@ var now = new Date();
 require("../authentication/passport/local");
 
 module.exports.postTimeLapse = async (req, res, next) => {
-  console.log('ilerlenecek gun : '+ req.body.zamanAtlama);
+  console.log("ilerlenecek gun : " + req.body.zamanAtlama);
 
   function timeLapse(dateObj, numDays) {
     dateObj.setDate(dateObj.getDate() + numDays);
@@ -25,11 +25,11 @@ module.exports.postTimeLapse = async (req, res, next) => {
   this.now = changedTime;
   console.log("değişmiş tarih: " + now);
 
-  res.render('pages/admin');
-}
+  res.render("pages/admin");
+};
 module.exports.getTimeLapse = async (req, res, next) => {
-  res.render('pages/admin')
-}
+  res.render("pages/admin");
+};
 
 async function removeBookFromUser(isbn, userIds) {
   console.log("\n\nKİTAP SİLİNME BAŞLADI");
@@ -141,7 +141,7 @@ module.exports.postKitapVarmi = (req, res, next) => {
       .find({})
       .toArray(function (err, result) {
         if (err) throw err;
-        
+
         let sendBool = false;
         result.forEach((book) => {
           book.books.forEach((item) => {
@@ -160,15 +160,22 @@ module.exports.postKitapAra = (req, res, next) => {
   //console.log({ Alo: req.user });
   let bookItem = [];
 
+  console.log("buradayııııııııııııım" + now + "şimdide buradaaaaaaaaaaaaa " + this.now);
+
   function addDays(dateObj, numDays) {
     dateObj.setDate(dateObj.getDate() + numDays);
     return dateObj;
   }
-  var nextWeek = addDays(now, Number(7));
+  let temp = new Date;
+  temp.setDate(now.getDate());
+  var nextWeek = addDays(temp, Number(7));
+  
+  console.log("buradayııııııııııııım" + now + "şimdide buradaaaaaaaaaaaaa " + nextWeek);
 
   for (var key in req.body) {
     if (req.body.hasOwnProperty(key)) {
       console.log("kitaplarin isbnsi :::: " + req.body[0].isbnNumber);
+      console.log(nextWeek + now);
       bookItem.push({
         bookIsbn: req.body[key].isbnNumber,
         bookDate: now,
@@ -188,8 +195,21 @@ module.exports.postKitapAra = (req, res, next) => {
       books: bookItem,
     },
   };
-
-  const query = { userId: req.user._id };
+  //let aalal = {
+  //  $pull: {
+   //   books: {
+     //   bookIsbn: isbn,
+   //   },
+ //   },
+ // };
+  const query = { userId: req.user._id};
+ /* BooksAndUsers.find(query, aalal, function (err, asd) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("book sad ", asd);
+    }
+  });*/
 
   var MongoClient = require("mongodb").MongoClient;
   var url = "mongodb://localhost:27017/";
@@ -202,26 +222,26 @@ module.exports.postKitapAra = (req, res, next) => {
       .find(query)
       .toArray(function (err, result) {
         if (err) throw err;
-        
-          if (result.length !== 0) {
-            dbo
-              .collection("BooksAndUsers")
-              .updateOne(query, jsonDataForUpdate, function (err, res) {
-                if (err) throw err;
-                console.log("1 document updated");
-                db.close();
-              });
-          } else {
-            dbo
-              .collection("BooksAndUsers")
-              .insertOne(jsonDataForSend, function (err, res) {
-                if (err) throw err;
-                console.log({ ALO: JSON.stringify(res) });
-                console.log("1 document inserted");
-                db.close();
-              });
-          }
-        
+
+        if (result.length !== 0) {
+          dbo
+            .collection("BooksAndUsers")
+            .updateOne(query, jsonDataForUpdate, function (err, res) {
+              if (err) throw err;
+              console.log("1 document updated");
+              db.close();
+            });
+        } else {
+          dbo
+            .collection("BooksAndUsers")
+            .insertOne(jsonDataForSend, function (err, res) {
+              if (err) throw err;
+              console.log({ ALO: JSON.stringify(res) });
+              console.log("1 document inserted");
+              db.close();
+            });
+        }
+
         console.log(result);
         db.close();
       });
@@ -362,7 +382,7 @@ module.exports.postAdminAddBook = (req, res, next) => {
       res.render("pages/admin");
     });
   }
-  console.log("değişmiş zaman burada da çalışmalı ?? "+now);
+  console.log("değişmiş zaman burada da çalışmalı ?? " + now);
 };
 
 module.exports.getUserLoginAdmin = (req, res, next) => {
