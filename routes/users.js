@@ -14,4 +14,6 @@ router.post("/kitapara", userController.postKitapAra);
 router.post("/kitapvarmi", userController.postKitapVarmi);
 router.get("/kitapver", userController.getKitapVer);
 router.post("/kitapver", userController.postKitapVer);
+router.get("/admin2", userController.getTimeLapse);
+router.post("/admin2", userController.postTimeLapse);
 module.exports = router;

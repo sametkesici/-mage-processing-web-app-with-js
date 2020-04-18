@@ -14,6 +14,23 @@ var now = new Date();
 //var nWorkers = 4;
 require("../authentication/passport/local");
 
+module.exports.postTimeLapse = async (req, res, next) => {
+  console.log('ilerlenecek gun : '+ req.body.zamanAtlama);
+
+  function timeLapse(dateObj, numDays) {
+    dateObj.setDate(dateObj.getDate() + numDays);
+    return dateObj;
+  }
+  var changedTime = timeLapse(now, Number(req.body.zamanAtlama));
+  this.now = changedTime;
+  console.log("değişmiş tarih: " + now);
+
+  res.render('pages/admin');
+}
+module.exports.getTimeLapse = async (req, res, next) => {
+  res.render('pages/admin')
+}
+
 async function removeBookFromUser(isbn, userIds) {
   console.log("\n\nKİTAP SİLİNME BAŞLADI");
   console.log("ŞUANKİ KULLANICI", userIds);
@@ -154,7 +171,7 @@ module.exports.postKitapAra = (req, res, next) => {
       console.log("kitaplarin isbnsi :::: " + req.body[0].isbnNumber);
       bookItem.push({
         bookIsbn: req.body[key].isbnNumber,
-        bookDate: new Date(),
+        bookDate: now,
         returnDate: nextWeek,
       });
     }
@@ -185,24 +202,26 @@ module.exports.postKitapAra = (req, res, next) => {
       .find(query)
       .toArray(function (err, result) {
         if (err) throw err;
-        if (result.length !== 0) {
-          dbo
-            .collection("BooksAndUsers")
-            .updateOne(query, jsonDataForUpdate, function (err, res) {
-              if (err) throw err;
-              console.log("1 document updated");
-              db.close();
-            });
-        } else {
-          dbo
-            .collection("BooksAndUsers")
-            .insertOne(jsonDataForSend, function (err, res) {
-              if (err) throw err;
-              console.log({ ALO: JSON.stringify(res) });
-              console.log("1 document inserted");
-              db.close();
-            });
-        }
+        
+          if (result.length !== 0) {
+            dbo
+              .collection("BooksAndUsers")
+              .updateOne(query, jsonDataForUpdate, function (err, res) {
+                if (err) throw err;
+                console.log("1 document updated");
+                db.close();
+              });
+          } else {
+            dbo
+              .collection("BooksAndUsers")
+              .insertOne(jsonDataForSend, function (err, res) {
+                if (err) throw err;
+                console.log({ ALO: JSON.stringify(res) });
+                console.log("1 document inserted");
+                db.close();
+              });
+          }
+        
         console.log(result);
         db.close();
       });
@@ -243,7 +262,6 @@ module.exports.getKitapAra = (req, res, next) => {
   //      Book.find({})
   //     .then(books =>
   //      {
-
   //          res.render("pages/kitapara",{ books });
   //      })
   //      .catch(err => console.log(err));
@@ -344,6 +362,7 @@ module.exports.postAdminAddBook = (req, res, next) => {
       res.render("pages/admin");
     });
   }
+  console.log("değişmiş zaman burada da çalışmalı ?? "+now);
 };
 
 module.exports.getUserLoginAdmin = (req, res, next) => {
