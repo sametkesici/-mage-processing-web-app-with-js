@@ -10,19 +10,16 @@ const { createWorker } = require("tesseract.js");
 const mongoose = require("mongoose");
 
 var now = new Date();
-
+let theEnd = "";
+theEnd = "sametttt";
+//The End
 //var nWorkers = 4;
 require("../authentication/passport/local");
 
 module.exports.postTimeLapse = async (req, res, next) => {
   console.log("ilerlenecek gun : " + req.body.zamanAtlama);
-
-  function timeLapse(dateObj, numDays) {
-    dateObj.setDate(dateObj.getDate() + numDays);
-    return dateObj;
-  }
-  var changedTime = timeLapse(now, Number(req.body.zamanAtlama));
-  this.now = changedTime;
+  now = now.setDate(now.getDate() + Number(req.body.zamanAtlama));
+  now = new Date(now);
   console.log("değişmiş tarih: " + now);
 
   res.render("pages/admin");
@@ -156,26 +153,43 @@ module.exports.postKitapVarmi = (req, res, next) => {
   });
 };
 
+module.exports.getKitapZaman = (req, res, next) => {
+  console.log({ SISTEMZAMANI: now });
+  var MongoClient = require("mongodb").MongoClient;
+  var url = "mongodb://localhost:27017/";
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    var dbo = db.db("yazlabdb");
+    dbo
+      .collection("BooksAndUsers")
+      .find({})
+      .toArray(function (err, result) {
+        if (err) throw err;
+
+        let sendBool = false;
+        result.forEach((book) => {
+          book.books.forEach((item) => {
+            console.log({ KITABINTARIHI: item.returnDate });
+            if (item.returnDate.getTime() < now.getTime()) {
+              sendBool = true;
+            }
+          });
+        });
+        res.send(sendBool);
+        db.close();
+      });
+  });
+};
+
 module.exports.postKitapAra = (req, res, next) => {
   //console.log({ Alo: req.user });
   let bookItem = [];
-
-  console.log("buradayııııııııııııım" + now + "şimdide buradaaaaaaaaaaaaa " + this.now);
-
-  function addDays(dateObj, numDays) {
-    dateObj.setDate(dateObj.getDate() + numDays);
-    return dateObj;
-  }
-  let temp = new Date;
-  temp.setDate(now.getDate());
-  var nextWeek = addDays(temp, Number(7));
-  
-  console.log("buradayııııııııııııım" + now + "şimdide buradaaaaaaaaaaaaa " + nextWeek);
-
+  let tempDate = new Date(now);
+  var nextWeek = tempDate.setDate(tempDate.getDate() + 7);
+  nextWeek = new Date(nextWeek);
   for (var key in req.body) {
     if (req.body.hasOwnProperty(key)) {
       console.log("kitaplarin isbnsi :::: " + req.body[0].isbnNumber);
-      console.log(nextWeek + now);
       bookItem.push({
         bookIsbn: req.body[key].isbnNumber,
         bookDate: now,
@@ -197,13 +211,13 @@ module.exports.postKitapAra = (req, res, next) => {
   };
   //let aalal = {
   //  $pull: {
-   //   books: {
-     //   bookIsbn: isbn,
-   //   },
- //   },
- // };
-  const query = { userId: req.user._id};
- /* BooksAndUsers.find(query, aalal, function (err, asd) {
+  //   books: {
+  //   bookIsbn: isbn,
+  //   },
+  //   },
+  // };
+  const query = { userId: req.user._id };
+  /* BooksAndUsers.find(query, aalal, function (err, asd) {
     if (err) {
       console.log(err);
     } else {
@@ -217,6 +231,7 @@ module.exports.postKitapAra = (req, res, next) => {
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
     var dbo = db.db("yazlabdb");
+
     dbo
       .collection("BooksAndUsers")
       .find(query)

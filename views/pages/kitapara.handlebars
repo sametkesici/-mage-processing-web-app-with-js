@@ -48,34 +48,54 @@
 
 <script>
 
+    kitapZaman = () => {
+        return new Promise((resolve, reject) => {
+            var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+            xmlhttp.open("GET", "/kitapzaman");
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    resolve(this.responseText)
+
+                }
+            };
+            xmlhttp.send();
+        })
+
+    }
 
     let bookList = [];
     let concList = '';
     saveBook = (e) => {
-        var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
-        xmlhttp.open("POST", "/kitapvarmi");
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        xmlhttp.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.responseText == "false") {
-                    if (bookList.length < 3) {
-                        concList = '';
-                        bookList = [...bookList, { bookName: e.innerText, isbnNumber: e.id }]
-                        bookList.forEach(book => {
-                            concList += `${book.bookName} `
-                        })
-                        document.querySelector("#chosenBooks").innerHTML = `Seçtiğin Kitaplar: ${concList}`
-                    } else {
-                        alert("3 ten fazla kitap secemezsiniz")
+        kitapZaman().then(res => {
+            if (res == "true") {
+                alert("Geri Vermediginiz Kitap Var. Kitap Ekleyemezsiniz")
+            } else {
+                var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+                xmlhttp.open("POST", "/kitapvarmi");
+                xmlhttp.setRequestHeader("Content-Type", "application/json");
+                xmlhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.responseText == "false") {
+                            if (bookList.length < 3) {
+                                concList = '';
+                                bookList = [...bookList, { bookName: e.innerText, isbnNumber: e.id }]
+                                bookList.forEach(book => {
+                                    concList += `${book.bookName} `
+                                })
+                                document.querySelector("#chosenBooks").innerHTML = `Seçtiğin Kitaplar: ${concList}`
+                            } else {
+                                alert("3 ten fazla kitap secemezsiniz")
+                            }
+                            console.log(bookList)
+                        } else {
+                            alert("KITAP BASKASINDA EKLI");
+                        }
                     }
-                    console.log(bookList)
-                } else {
-                    alert("KITAP BASKASINDA EKLI");
-                }
+                };
+                xmlhttp.send(JSON.stringify({ id: e.id }));
             }
-        };
-        xmlhttp.send(JSON.stringify({ id: e.id }));
-
+        })
     }
 
     submitBooks = (e) => {
