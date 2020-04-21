@@ -10,10 +10,6 @@ const { createWorker } = require("tesseract.js");
 const mongoose = require("mongoose");
 
 var now = new Date();
-let theEnd = "";
-theEnd = "sametttt";
-//The End
-//var nWorkers = 4;
 require("../authentication/passport/local");
 
 module.exports.postTimeLapse = async (req, res, next) => {
@@ -184,12 +180,14 @@ module.exports.getKitapZaman = (req, res, next) => {
 module.exports.postKitapAra = (req, res, next) => {
   //console.log({ Alo: req.user });
   let bookItem = [];
+
   let tempDate = new Date(now);
   var nextWeek = tempDate.setDate(tempDate.getDate() + 7);
   nextWeek = new Date(nextWeek);
+
   for (var key in req.body) {
     if (req.body.hasOwnProperty(key)) {
-      console.log("kitaplarin isbnsi :::: " + req.body[0].isbnNumber);
+      console.log("blablalbal : " + req.body[key].isbnNumber);
       bookItem.push({
         bookIsbn: req.body[key].isbnNumber,
         bookDate: now,
@@ -202,28 +200,7 @@ module.exports.postKitapAra = (req, res, next) => {
     userId: req.user._id,
     books: bookItem,
   };
-
-  let jsonDataForUpdate = {
-    $set: {
-      userId: req.user._id,
-      books: bookItem,
-    },
-  };
-  //let aalal = {
-  //  $pull: {
-  //   books: {
-  //   bookIsbn: isbn,
-  //   },
-  //   },
-  // };
   const query = { userId: req.user._id };
-  /* BooksAndUsers.find(query, aalal, function (err, asd) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("book sad ", asd);
-    }
-  });*/
 
   var MongoClient = require("mongodb").MongoClient;
   var url = "mongodb://localhost:27017/";
@@ -231,21 +208,37 @@ module.exports.postKitapAra = (req, res, next) => {
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
     var dbo = db.db("yazlabdb");
-
     dbo
       .collection("BooksAndUsers")
       .find(query)
       .toArray(function (err, result) {
         if (err) throw err;
-
         if (result.length !== 0) {
-          dbo
-            .collection("BooksAndUsers")
-            .updateOne(query, jsonDataForUpdate, function (err, res) {
-              if (err) throw err;
-              console.log("1 document updated");
-              db.close();
+          if (result[0].books.length >= 3) {
+            res.send(false);
+          } else {
+            let newBookArray = [];
+            result.forEach((book) => {
+              newBookArray.push(...book.books);
             });
+
+            let newBookItem = [...newBookArray, ...bookItem];
+            console.log({ TEKAT: newBookItem });
+            console.log({ TEKAT2: result });
+            let jsonDataForUpdate2 = {
+              $set: {
+                userId: req.user._id,
+                books: newBookItem,
+              },
+            };
+            dbo
+              .collection("BooksAndUsers")
+              .updateOne(query, jsonDataForUpdate2, function (err, res) {
+                if (err) throw err;
+                console.log("1 document updated");
+                db.close();
+              });
+          }
         } else {
           dbo
             .collection("BooksAndUsers")
@@ -256,7 +249,6 @@ module.exports.postKitapAra = (req, res, next) => {
               db.close();
             });
         }
-
         console.log(result);
         db.close();
       });
@@ -284,23 +276,6 @@ module.exports.getKitapAra = (req, res, next) => {
       })
       .catch((err) => console.log(err));
   }
-
-  //  if (req.query.search) {
-  //      Book.find({"bookName": req.query.search})
-  //      .then(books => {
-  //         res.render("pages/kitapara",{books});
-  //         console.log({ALO:books})
-  //      })
-  //      .catch(err =>console.log(err));
-
-  //   }else{
-  //      Book.find({})
-  //     .then(books =>
-  //      {
-  //          res.render("pages/kitapara",{ books });
-  //      })
-  //      .catch(err => console.log(err));
-  //   }
 };
 
 //admin kitap ekleme
@@ -326,8 +301,6 @@ module.exports.postAdminAddBook = (req, res, next) => {
     isbnNumber,
   };
 
-  //let image = imageThreshold(req.files.imageFile, { imageThreshold: 30 }, nWorkers);
-
   //dosyayı taşı
   req.files.imageFile.mv(imageAddress, async function (error) {
     if (error) {
@@ -335,12 +308,6 @@ module.exports.postAdminAddBook = (req, res, next) => {
       console.log(error);
     } else {
       console.log("Image file successfully uploaded!");
-      /*readText(imageAddress)
-        .then((isbnNumber) => {
-          data1.isbn = isbnNumber;
-          console.log("mahmuuut"+ data1.isbn)
-        })
-        .catch();*/
       data1.isbnNumber = await readText(imageAddress);
       await saveToDatabase(data1);
     }

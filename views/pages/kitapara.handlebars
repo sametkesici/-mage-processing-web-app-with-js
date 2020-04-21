@@ -103,7 +103,17 @@
         var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
         xmlhttp.open("POST", "/kitapara");
         xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.responseText == 'false') {
+                    alert("3 Ten Fazla Kitap Ekleyemezsiniz");
+                }
+
+            }
+        };
         xmlhttp.send(JSON.stringify(bookList));
+
+        document.querySelector("#chosenBooks").innerHTML = `Seçtiğin Kitaplar: `
 
     }
 

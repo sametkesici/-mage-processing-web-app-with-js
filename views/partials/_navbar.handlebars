@@ -1,44 +1,44 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark m-2">
   <a class="navbar-brand" href="/">Yazlab</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+    aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
 
       {{#if user}}
-        <li class="nav-item active">
+      <li class="nav-item active">
         <a class="nav-link" href="/kitapara">Kitap Ara</a>
-        </li>
+      </li>
 
-        <li class="nav-item active">
-          <a class="nav-link" href="/kitapver">Kitap Ver</a>
-        </li>
-         <li class="nav-item active">
+      <li class="nav-item active">
+        <a class="nav-link" href="/kitapver">Kitap Ver</a>
+      </li>
+      <li class="nav-item active">
         <a class="nav-link" href="/logout">Log out</a>
-        </li>
+      </li>
 
       {{else}}
-         <li class="nav-item active">
+      <li class="nav-item active">
         <a class="nav-link" href="/login">Login</a>
-        </li>
+      </li>
       {{/if}}
 
-        <li class="nav-item active">
+      <li class="nav-item active">
         <a class="nav-link" href="/register">Register</a>
-        </li>
-        
+      </li>
+
 
       {{#if user.isAdmin}}
-        <li class="nav-item active">
+      <li class="nav-item active">
         <a class="nav-link" href="/admin">Admin</a>
-        </li>
+      </li>
       {{/if}}
-      
 
-      
-   
+
+
+
     </ul>
   </div>
 </nav>
-
