@@ -6,8 +6,8 @@ const BooksAndUsers = require("../models/BooksAndUsers");
 const passport = require("passport");
 var mongodb = require("mongodb");
 const { createWorker } = require("tesseract.js");
-//var imageThreshold = require("image-filter-threshold");
 const mongoose = require("mongoose");
+const sharp = require("sharp");
 
 var now = new Date();
 require("../authentication/passport/local");
@@ -278,6 +278,26 @@ module.exports.getKitapAra = (req, res, next) => {
   }
 };
 
+async function imageOperations(imagePath) {
+  let temp = "./gorsel/temp/.jpeg";
+  return sharp(imagePath)
+    .rotate()
+    .toFile(temp)
+    .then((ImageResult) => {
+      response.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
+        error: false,
+        filepath: temp,
+        message: CONSTANTS.SUCCESSFUL_MESSAGE,
+      });
+    })
+    .catch(() => {
+      response.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
+        error: true,
+        message: CONSTANTS.SERVER_ERROR_MESSAGE,
+      });
+    });
+}
+
 //admin kitap ekleme
 module.exports.postAdminAddBook = (req, res, next) => {
   var bookName = req.body.bookName;
@@ -308,6 +328,7 @@ module.exports.postAdminAddBook = (req, res, next) => {
       console.log(error);
     } else {
       console.log("Image file successfully uploaded!");
+      let img = await imageOperations(imageAddress);
       data1.isbnNumber = await readText(imageAddress);
       await saveToDatabase(data1);
     }
