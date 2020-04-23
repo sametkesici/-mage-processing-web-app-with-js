@@ -279,22 +279,16 @@ module.exports.getKitapAra = (req, res, next) => {
 };
 
 async function imageOperations(imagePath) {
-  let temp = "./gorsel/temp/.jpeg";
-  return sharp(imagePath)
+  let temp = `gorsel/temp.jpeg`;
+  sharp(imagePath)
+    .threshold(100)
     .rotate()
     .toFile(temp)
     .then((ImageResult) => {
-      response.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
-        error: false,
-        filepath: temp,
-        message: CONSTANTS.SUCCESSFUL_MESSAGE,
-      });
+      console.log("tamamlan laaaa");
     })
-    .catch(() => {
-      response.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
-        error: true,
-        message: CONSTANTS.SERVER_ERROR_MESSAGE,
-      });
+    .catch((err) => {
+      console.log("aLOOOOOOOOOOOOO hata var:", err);
     });
 }
 
@@ -328,9 +322,9 @@ module.exports.postAdminAddBook = (req, res, next) => {
       console.log(error);
     } else {
       console.log("Image file successfully uploaded!");
-      let img = await imageOperations(imageAddress);
       data1.isbnNumber = await readText(imageAddress);
       await saveToDatabase(data1);
+      await imageOperations(imageAddress);
     }
   });
 
