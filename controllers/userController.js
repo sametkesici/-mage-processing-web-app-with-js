@@ -290,6 +290,28 @@ async function imageOperations(imagePath) {
     .catch((err) => {
       console.log("aLOOOOOOOOOOOOO hata var:", err);
     });
+  let greyScale = `gorsel/greyScale.jpeg`;
+  sharp(imagePath)
+    .gamma()
+    .greyscale()
+    .rotate()
+    .toFile(greyScale)
+    .then((ImageResult) => {
+      console.log("tamamlan laaaa");
+    })
+    .catch((err) => {
+      console.log("aLOOOOOOOOOOOOO hata var:", err);
+    });
+  let grayScale = `gorsel/grayScale.jpeg`;
+  sharp(imagePath)
+    .grayscale.rotate()
+    .toFile(grayScale)
+    .then((ImageResult) => {
+      console.log("tamamlan laaaa");
+    })
+    .catch((err) => {
+      console.log("aLOOOOOOOOOOOOO hata var:", err);
+    });
 }
 
 //admin kitap ekleme
